@@ -21,6 +21,10 @@ def get_bus_locations():
     
     return jsonify(bus_data), 200
 
+@app_routes.route('/test', methods=['GET'])
+def test():
+    return jsonify({'message': 'testing endpoint'})
+
 #base url root
 @app_routes.route('/')
 def web_interface():
