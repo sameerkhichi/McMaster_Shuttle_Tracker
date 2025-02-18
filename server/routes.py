@@ -1,5 +1,5 @@
 from flask import Flask, request, Blueprint, jsonify, redirect, url_for, render_template
-from models import db, BusLocation
+from server.models import db, BusLocation
 
 #blueprints for the routes
 app_routes = Blueprint('app_routes', __name__)
