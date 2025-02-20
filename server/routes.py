@@ -1,5 +1,8 @@
-from flask import Flask, request, Blueprint, jsonify, redirect, url_for, render_template
-from server.models import db, BusLocation
+#note that these routes arent designed for http theyre just api endpoints which work from terminal and react frontend
+#there could be unexpected request formats, react and curl work fine so it shouldnt be a problem
+#just dont try accessing the api endpoints through a raw browser
+from flask import Flask, request, Blueprint, jsonify, make_response
+from models import db, BusLocation
 
 #blueprints for the routes
 app_routes = Blueprint('app_routes', __name__)
@@ -16,20 +19,19 @@ def get_bus_locations():
             "bus_id": loc.bus_id,
             "lat": loc.latitude,
             "lon": loc.longitude,
-            "timestamp": loc.timestamp
+            "time_stamp": loc.time_stamp
         })
     
-    return jsonify(bus_data), 200
+    #I tried adding this so that it would stop throwing an error when accessing it (it didnt)
+    #but this does stop different versioning of http headers
+    response = make_response(jsonify(bus_data), 200)
+    response.headers["Content-Type"] = "application/json"
+    response.headers["Cache-Control"] = "no-cache"
+    return response
 
-@app_routes.route('/test', methods=['GET'])
-def test():
-    return jsonify({'message': 'testing endpoint'})
-
-#base url root
+#base url root - we dont have an html root, the flask server is just for api endpoints
 @app_routes.route('/')
 def web_interface():
 
-    locations = BusLocation.query.all()
-
-    return render_template('placeholder', locations) #replace placeholder with the JS file for frontend
+    return "Flask server is running, use this server for API endpoint calls"
 
