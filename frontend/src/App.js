@@ -14,6 +14,7 @@ function App(){
   }, []);
 
   //this will return bus locations if there are any in the database - otherwise no locations available
+  //does this with an advanced if-else statement basically
   return (
       <div>
           <h1>Bus Locations</h1>
@@ -21,7 +22,7 @@ function App(){
               <ul>
                   {busLocations.map((bus, index) => (
                       <li key={index}>
-                          <strong>Bus {bus.bus_id}:</strong> {bus.lat}, {bus.lon} (Updated: {new Date(bus.time_stamp * 1000).toLocaleString()})
+                          <strong>Bus {bus.bus_id}:</strong> {bus.lat}, {bus.lon} (Updated: {bus.time_stamp})
                       </li>
                   ))}
               </ul>
