@@ -29,6 +29,37 @@ def get_bus_locations():
     response.headers["Cache-Control"] = "no-cache"
     return response
 
+@app_routes.route('/Live_Location', methods=['POST'])
+def receive_gpsdata():
+    #the app being used owntracks sends json data
+    data = request.json
+
+    #DEBUG - this was such an annoying fix
+    #print("Returned data: ", data)
+
+    #this is basically checking and making sure the data being sent to the server is an actual location
+    #making sure the data sent is of type location cuz owntracks can be a little silly
+    if data.get("_type") != "location":
+        return jsonify({"error": "No data received"}), 400
+
+    #extracting the relevant data
+    bus_id=data.get("tid", "unknown"),  # Optional: OwnTracks doesn't send bus_id, we might need a workaround
+    latitude=data.get("lat"),
+    longitude=data.get("lon"),
+    timestamp=data.get("tst")  # 'tst' is the timestamp field in OwnTracks
+
+    if latitude is None or longitude is None or timestamp is None:
+        return jsonify({"error": "Missing required fields"}), 400
+
+    #after verification add it to the database
+    new_location = BusLocation(bus_id=bus_id, latitude=latitude, longitude=longitude, time_stamp=timestamp)
+
+    db.session.add(new_location)
+    db.session.commit
+
+    return jsonify({"message": "Location received"}), 200
+
+
 #base url root - we dont have an html root, the flask server is just for api endpoints
 @app_routes.route('/')
 def web_interface():

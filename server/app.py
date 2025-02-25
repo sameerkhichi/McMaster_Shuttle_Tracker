@@ -23,4 +23,5 @@ def handle_error_badRequest(e):
 
 #for debugging
 if __name__ == '__main__':
-    app.run(debug=True, threaded=True) #threaded stops bad versioned requests
+    app.run(host='0.0.0.0', port=5000, debug=True) #making flask accessible to other devices
+    #app.run(debug=True, threaded=True) #threaded stops bad versioned requests
