@@ -59,12 +59,24 @@ def receive_gpsdata():
     timestamp = datetime.utcfromtimestamp(timestamp)
 
     #after verification add it to the database
-    new_location = BusLocation(bus_id=bus_id, latitude=latitude, longitude=longitude, time_stamp=timestamp)
-
+    #new_location = BusLocation(bus_id=bus_id, latitude=latitude, longitude=longitude, time_stamp=timestamp)
     #DEBUG - print data to be added to the database
-    print("Database addition: ", new_location)
+    #print("Database addition: ", new_location)
 
-    db.session.add(new_location)
+
+    #inserting the new location - if the bus_id already exists then just update its location
+    #Have to use mysql command: ALTER TABLE bus_locations ADD CONSTRAINT unique_bus UNIQUE (bus_id);
+    existing_location = BusLocation.query.filter_by(bus_id=bus_id).first() #returns first matching record
+
+    if(existing_location):
+        existing_location.latitude = latitude
+        existing_location.longitude = longitude
+        existing_location.time_stamp = timestamp
+    else:
+        new_location = BusLocation(bus_id=bus_id, latitude=latitude, longitude=longitude, time_stamp=timestamp) 
+        db.session.add(new_location)
+    
+
     db.session.commit()
 
     return jsonify({"message": "Location received"}), 200
