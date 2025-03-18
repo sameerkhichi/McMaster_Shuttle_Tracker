@@ -11,4 +11,4 @@ class BusLocation(db.Model):
     time_stamp = db.Column(db.DateTime, nullable = False)
 
     def __repr__(self):
-        return f"<BusLocation {self.bus_id} - {self.latitude}, {self.longitude}>"
+        return f"<BusLocation {self.bus_id} - {self.latitude}, {self.longitude}, {self.time_stamp}>"

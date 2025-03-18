@@ -3,6 +3,7 @@
 #just dont try accessing the api endpoints through a raw browser
 from flask import Flask, request, Blueprint, jsonify, make_response
 from models import db, BusLocation
+from datetime import datetime
 
 #blueprints for the routes
 app_routes = Blueprint('app_routes', __name__)
@@ -29,10 +30,13 @@ def get_bus_locations():
     response.headers["Cache-Control"] = "no-cache"
     return response
 
+#to send a location manually hit the share then the send location now button
+#MAKE SURE OWNTRACKS IS ON MOVE MODE SO YOU GET CONSTANT UPDATES
 @app_routes.route('/Live_Location', methods=['POST'])
 def receive_gpsdata():
     #the app being used owntracks sends json data
     data = request.json
+
 
     #DEBUG - this was such an annoying fix
     #print("Returned data: ", data)
@@ -40,22 +44,28 @@ def receive_gpsdata():
     #this is basically checking and making sure the data being sent to the server is an actual location
     #making sure the data sent is of type location cuz owntracks can be a little silly
     if data.get("_type") != "location":
-        return jsonify({"error": "No data received"}), 400
+        return jsonify({"error": "No location data received"}), 400
 
-    #extracting the relevant data
-    bus_id=data.get("tid", "unknown"),  # Optional: OwnTracks doesn't send bus_id, we might need a workaround
-    latitude=data.get("lat"),
-    longitude=data.get("lon"),
-    timestamp=data.get("tst")  # 'tst' is the timestamp field in OwnTracks
+    #extracting the relevant data - make sure this isnt a tuple
+    bus_id = data.get("tid", "unknown")  # Optional: OwnTracks doesn't send bus_id, we might need a workaround
+    latitude = data.get("lat")
+    longitude = data.get("lon")
+    timestamp = data.get("tst")  # 'tst' is the timestamp field in OwnTracks
 
     if latitude is None or longitude is None or timestamp is None:
         return jsonify({"error": "Missing required fields"}), 400
 
+    #owntracks sends tst time stamps in UNIX format whereas mysql expects DATETIME type YYYY-MM-DD HH:MM:SS
+    timestamp = datetime.utcfromtimestamp(timestamp)
+
     #after verification add it to the database
     new_location = BusLocation(bus_id=bus_id, latitude=latitude, longitude=longitude, time_stamp=timestamp)
 
+    #DEBUG - print data to be added to the database
+    print("Database addition: ", new_location)
+
     db.session.add(new_location)
-    db.session.commit
+    db.session.commit()
 
     return jsonify({"message": "Location received"}), 200
 
@@ -66,3 +76,6 @@ def web_interface():
 
     return "Flask server is running, use this server for API endpoint calls"
 
+# fix the problem where the locations arent sending to the database
+# find out how to get this displayed to make sure it is working
+#look through the mysql cmd to see if it is being updated.
