@@ -3,7 +3,7 @@
 #just dont try accessing the api endpoints through a raw browser
 from flask import Flask, request, Blueprint, jsonify, make_response
 from models import db, BusLocation
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 #blueprints for the routes
 app_routes = Blueprint('app_routes', __name__)
@@ -31,7 +31,8 @@ def get_bus_locations():
     return response
 
 #to send a location manually hit the share then the send location now button
-#MAKE SURE OWNTRACKS IS ON MOVE MODE SO YOU GET CONSTANT UPDATES
+#MAKE SURE OWNTRACKS IS ON MOVE MODE SO YOU GET CONSTANT UPDATES set monitoring = 2 (check owntracks settings below)
+#in move mode new location as soon as the device moves locatorDisplacement meters or after locatorInterval seconds
 @app_routes.route('/Live_Location', methods=['POST'])
 def receive_gpsdata():
     #the app being used owntracks sends json data
@@ -56,7 +57,9 @@ def receive_gpsdata():
         return jsonify({"error": "Missing required fields"}), 400
 
     #owntracks sends tst time stamps in UNIX format whereas mysql expects DATETIME type YYYY-MM-DD HH:MM:SS
-    timestamp = datetime.utcfromtimestamp(timestamp)
+    timestamp = datetime.utcfromtimestamp(timestamp) #universal time
+    timestamp = timestamp - timedelta(hours=4) #converting to EST for display and storage
+ 
 
     #after verification add it to the database
     #new_location = BusLocation(bus_id=bus_id, latitude=latitude, longitude=longitude, time_stamp=timestamp)
@@ -87,7 +90,3 @@ def receive_gpsdata():
 def web_interface():
 
     return "Flask server is running, use this server for API endpoint calls"
-
-# fix the problem where the locations arent sending to the database
-# find out how to get this displayed to make sure it is working
-#look through the mysql cmd to see if it is being updated.
