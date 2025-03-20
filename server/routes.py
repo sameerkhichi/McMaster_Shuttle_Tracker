@@ -59,13 +59,6 @@ def receive_gpsdata():
     #owntracks sends tst time stamps in UNIX format whereas mysql expects DATETIME type YYYY-MM-DD HH:MM:SS
     timestamp = datetime.utcfromtimestamp(timestamp) #universal time
     timestamp = timestamp - timedelta(hours=4) #converting to EST for display and storage
- 
-
-    #after verification add it to the database
-    #new_location = BusLocation(bus_id=bus_id, latitude=latitude, longitude=longitude, time_stamp=timestamp)
-    #DEBUG - print data to be added to the database
-    #print("Database addition: ", new_location)
-
 
     #inserting the new location - if the bus_id already exists then just update its location
     #Have to use mysql command: ALTER TABLE bus_locations ADD CONSTRAINT unique_bus UNIQUE (bus_id);
