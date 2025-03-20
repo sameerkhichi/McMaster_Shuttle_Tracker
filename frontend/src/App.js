@@ -9,9 +9,14 @@ function App(){
       async function getData(){
           const data = await fetchBusLocations();
           setBusLocations(data);
-      }
+      };
+
       getData();
-  }, []);
+
+      const interval = setInterval(getData, 15000); //fetch data every 15 seconds
+
+      return () => clearInterval(interval);
+    }, []);
 
   //this will return bus locations if there are any in the database - otherwise no locations available
   //does this with an advanced if-else statement basically
@@ -22,7 +27,7 @@ function App(){
               <ul>
                   {busLocations.map((bus, index) => (
                       <li key={index}>
-                          <strong>Bus {bus.bus_id}:</strong> {bus.lat}, {bus.lon} (Updated: {bus.time_stamp})
+                          <strong>Bus {bus.bus_id}:</strong> {bus.lat}, {bus.lon} (Seen at: {bus.time_stamp})
                       </li>
                   ))}
               </ul>
