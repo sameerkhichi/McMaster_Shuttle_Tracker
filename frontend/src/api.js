@@ -6,7 +6,7 @@ const API_URL = "http://127.0.0.1:5000"; //USE HTTP NOT HTTPS OTHERWISE IT WILL 
 //getting the bus locations from flask
 export async function fetchBusLocations(){
     try{
-        const response = await fetch(`${API_URL}/bus-locations`, {
+        const response = await fetch(`${API_URL}/update`, {
             method: "GET", //ensuring the right request type is being used
             headers: {
                 "Content-Type": "application/json"

@@ -4,11 +4,12 @@
 from flask import Flask, request, Blueprint, jsonify, make_response
 from models import db, BusLocation
 from datetime import datetime, timedelta, timezone
+import helper
 
 #blueprints for the routes
 app_routes = Blueprint('app_routes', __name__)
 
-@app_routes.route('/bus-locations', methods=['GET'])
+@app_routes.route('/update', methods=['GET'])
 def get_bus_locations():
 
     #get all the bus location records from the database
@@ -18,8 +19,8 @@ def get_bus_locations():
     for loc in locations:
         bus_data.append({
             "bus_id": loc.bus_id,
-            "lat": loc.latitude,
-            "lon": loc.longitude,
+            "nearest_stop": loc.nearest_stop,
+            "eta": loc.eta,
             "time_stamp": loc.time_stamp
         })
     
@@ -59,6 +60,9 @@ def receive_gpsdata():
     #owntracks sends tst time stamps in UNIX format whereas mysql expects DATETIME type YYYY-MM-DD HH:MM:SS
     timestamp = datetime.utcfromtimestamp(timestamp) #universal time
     timestamp = timestamp - timedelta(hours=4) #converting to EST for display and storage
+
+
+    nearest_stop = helper.find_stop(bus_id, latitude, longitude, timestamp)
 
     #inserting the new location - if the bus_id already exists then just update its location
     #Have to use mysql command: ALTER TABLE bus_locations ADD CONSTRAINT unique_bus UNIQUE (bus_id);
