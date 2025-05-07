@@ -37,12 +37,8 @@ def get_bus_locations():
 @app_routes.route('/Live_Location', methods=['POST'])
 #this functions will get the live location, then use it for the calculations
 def receive_gpsdata():
-    #the app being used owntracks sends json data
-    data = request.json
-
-
-    #DEBUG - this was such an annoying fix
-    #print("Returned data: ", data)
+    
+    data = request.json #owntracks sends json data
 
     #this is basically checking and making sure the data being sent to the server is an actual location
     #making sure the data sent is of type location cuz owntracks can be a little silly
@@ -50,10 +46,10 @@ def receive_gpsdata():
         return jsonify({"error": "No location data received"}), 400
 
     #extracting the relevant data - make sure this isnt a tuple
-    bus_id = data.get("tid", "unknown")  # Optional: OwnTracks doesn't send bus_id, we might need a workaround
+    bus_id = data.get("tid", "unknown")
     latitude = data.get("lat")
     longitude = data.get("lon")
-    timestamp = data.get("tst")  # 'tst' is the timestamp field in OwnTracks
+    timestamp = data.get("tst")  #'tst' is the timestamp field in OwnTracks
 
     if latitude is None or longitude is None or timestamp is None:
         return jsonify({"error": "Missing required fields"}), 400
