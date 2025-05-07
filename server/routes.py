@@ -35,6 +35,7 @@ def get_bus_locations():
 #MAKE SURE OWNTRACKS IS ON MOVE MODE SO YOU GET CONSTANT UPDATES set monitoring = 2 (check owntracks settings below)
 #in move mode new location as soon as the device moves locatorDisplacement meters or after locatorInterval seconds
 @app_routes.route('/Live_Location', methods=['POST'])
+#this functions will get the live location, then use it for the calculations
 def receive_gpsdata():
     #the app being used owntracks sends json data
     data = request.json
@@ -61,25 +62,25 @@ def receive_gpsdata():
     timestamp = datetime.utcfromtimestamp(timestamp) #universal time
     timestamp = timestamp - timedelta(hours=4) #converting to EST for display and storage
 
-
-    nearest_stop = helper.find_stop(bus_id, latitude, longitude, timestamp)
-
     #inserting the new location - if the bus_id already exists then just update its location
     #Have to use mysql command: ALTER TABLE bus_locations ADD CONSTRAINT unique_bus UNIQUE (bus_id);
     existing_location = BusLocation.query.filter_by(bus_id=bus_id).first() #returns first matching record
+    
+    nearest_stop = helper.find_stop(latitude, longitude)
+    eta = helper.get_eta(latitude, longitude, timestamp, nearest_stop)
 
     if(existing_location):
-        existing_location.latitude = latitude
-        existing_location.longitude = longitude
+        existing_location.nearest_stop = nearest_stop
+        existing_location.eta = eta
         existing_location.time_stamp = timestamp
     else:
-        new_location = BusLocation(bus_id=bus_id, latitude=latitude, longitude=longitude, time_stamp=timestamp) 
+        new_location = BusLocation(bus_id=bus_id, nearest_stop=nearest_stop, eta=eta, time_stamp=timestamp) 
         db.session.add(new_location)
     
 
     db.session.commit()
 
-    return jsonify({"message": "Location received"}), 200
+    return jsonify({"message": "Location updated"}), 200
 
 
 #base url root - we dont have an html root, the flask server is just for api endpoints

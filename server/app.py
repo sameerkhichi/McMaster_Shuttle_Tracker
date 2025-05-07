@@ -11,7 +11,7 @@ app.config.from_object('configuration.config')
 app.register_blueprint(app_routes)
 db.init_app(app)
 
-#create the tables in the database
+#create the tables in the database - if you change the model you have to recreate the table
 with app.app_context():
     db.create_all()
 
