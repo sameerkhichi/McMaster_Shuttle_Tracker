@@ -13,9 +13,9 @@ stops = {
 }
 
 #calculates the threshold - for proximity location - returns distance in meters from coordinates
-def haversine(lat1, lon1, lat2, lon2):
+def get_distance(lat1, lon1, lat2, lon2):
     #Earth radius in meters
-    R = 6371000
+    R = 6378137
     phi1 = math.radians(lat1)
     phi2 = math.radians(lat2)
     delta_phi = math.radians(lat2 - lat1)
@@ -35,7 +35,7 @@ def find_stop(lat, lon, threshold = 30): #proximity of 30m
 
     #find which stop the bus is closest to
     for stop_name, (stop_lat, stop_lon) in stops.items():
-        distance = haversine(lat, lon, stop_lat, stop_lon) #get distance in meters
+        distance = get_distance(lat, lon, stop_lat, stop_lon) #get distance in meters
         if distance < closest_distance and distance <= threshold:
             closest_stop = stop_name
             closest_distance = distance

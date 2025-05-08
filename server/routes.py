@@ -20,6 +20,7 @@ def get_bus_locations():
         bus_data.append({
             "bus_id": loc.bus_id,
             "nearest_stop": loc.nearest_stop,
+            "previous_stop": loc.previous_stop,
             "eta": loc.eta,
             "time_stamp": loc.time_stamp
         })
@@ -65,12 +66,17 @@ def receive_gpsdata():
     nearest_stop = helper.find_stop(latitude, longitude)
     eta = helper.get_eta(latitude, longitude, timestamp, nearest_stop)
 
-    if(existing_location):
-        existing_location.nearest_stop = nearest_stop
+    if existing_location:
+        #keeps track of the previous stop - if different from one stored in db
+        if nearest_stop != existing_location.nearest_stop and nearest_stop is not None:
+            existing_location.prev_stop = existing_location.nearest_stop
+            existing_location.nearest_stop = nearest_stop
+        
+        #note no need to update stop if its the same one as in the db currently
         existing_location.eta = eta
         existing_location.time_stamp = timestamp
     else:
-        new_location = BusLocation(bus_id=bus_id, nearest_stop=nearest_stop, eta=eta, time_stamp=timestamp) 
+        new_location = BusLocation(bus_id=bus_id, nearest_stop=nearest_stop, previous_stop="N/A", eta=eta, time_stamp=timestamp) 
         db.session.add(new_location)
     
 
