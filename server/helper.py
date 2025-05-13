@@ -12,6 +12,13 @@ stops = {
     "Lot I": [43.26, -79.9217] # +- 4m
 }
 
+#if there are ever more pairs that are close together add the order logic here
+STOP_ORDER = {
+    "ABB": ["MUSC"], #if previous stop was musc choose ABB
+    "Lot_I": ["Lot M", "Inside Lot M"] #either one could come before lot I
+}
+
+
 #calculates the threshold - for proximity location - returns distance in meters from coordinates
 def get_distance(lat1, lon1, lat2, lon2):
     #Earth radius in meters
@@ -28,17 +35,26 @@ def get_distance(lat1, lon1, lat2, lon2):
     return R * c  #distance in meters
 
 #returns the closest stop - on frontend it will display it as there or as 'next stop'
-def find_stop(lat, lon, threshold = 30): #proximity of 30m
+def find_stop(lat, lon, prev_stop, threshold = 30): #proximity of 30m
 
     closest_stop = None
     closest_distance = float('inf')
+    candidates = []
 
-    #find which stop the bus is closest to
     for stop_name, (stop_lat, stop_lon) in stops.items():
-        distance = get_distance(lat, lon, stop_lat, stop_lon) #get distance in meters
-        if distance < closest_distance and distance <= threshold:
-            closest_stop = stop_name
-            closest_distance = distance
+        distance = get_distance(lat, lon, stop_lat, stop_lon)
+        if distance <= threshold:
+            candidates.append((stop_name, distance))
+            if distance < closest_distance:
+                closest_stop = stop_name
+                closest_distance = distance
+
+    if len(candidates) > 1 and prev_stop:
+        #failsafe to check and differentiate between lot I and ABB
+        for stop_name, _ in candidates:
+            expected_prev = STOP_ORDER.get(stop_name, [])
+            if expected_prev == prev_stop:
+                return stop_name
 
     return closest_stop #none if not within threshold
 

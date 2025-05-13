@@ -63,7 +63,7 @@ def receive_gpsdata():
     #Have to use mysql command: ALTER TABLE bus_locations ADD CONSTRAINT unique_bus UNIQUE (bus_id);
     existing_location = BusLocation.query.filter_by(bus_id=bus_id).first() #returns first matching record
     
-    nearest_stop = helper.find_stop(latitude, longitude)
+    nearest_stop = helper.find_stop(latitude, longitude, existing_location.prev_stop)
     eta = helper.get_eta(latitude, longitude, timestamp, nearest_stop)
 
     if existing_location:
