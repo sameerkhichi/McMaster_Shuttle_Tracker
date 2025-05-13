@@ -64,7 +64,7 @@ def receive_gpsdata():
     existing_location = BusLocation.query.filter_by(bus_id=bus_id).first() #returns first matching record
     
     nearest_stop = helper.find_stop(latitude, longitude, existing_location.prev_stop)
-    eta = helper.get_eta(latitude, longitude, timestamp, nearest_stop)
+    eta = helper.get_eta(latitude, longitude, nearest_stop, existing_location.prev_stop)
 
     if existing_location:
         #keeps track of the previous stop - if different from one stored in db

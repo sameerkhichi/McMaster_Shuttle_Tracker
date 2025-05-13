@@ -14,10 +14,23 @@ stops = {
 
 #if there are ever more pairs that are close together add the order logic here
 STOP_ORDER = {
-    "ABB": ["MUSC"], #if previous stop was musc choose ABB
-    "Lot_I": ["Lot M", "Inside Lot M"] #either one could come before lot I
+    "A.B.B": ["MUSC"], #if previous stop was musc choose ABB
+    "Lot I": ["Lot M", "Inside Lot M"], #either one could come before lot I
+    "MUSC": ["Lot I"],
+    "Mary Keyes": ["A.B.B"],
+    "Lot P": ["Mary Keyes"],
+    "Lot M": ["Lot P"]
 }
 
+#duration of trip between stops - hardcoded for now - time in minutes
+STOP_TIMES = {
+    ("MUSC", "A.B.B"): 6,
+    ("A.B.B", "Mary Keyes"): 2,
+    ("Mary Keyes", "Lot P"): 2,
+    ("Lot P", "Lot M"): 2,
+    ("Lot M", "Lot I"): 4,
+    ("Lot I", "MUSC"): 6 
+}
 
 #calculates the threshold - for proximity location - returns distance in meters from coordinates
 def get_distance(lat1, lon1, lat2, lon2):
@@ -49,6 +62,7 @@ def find_stop(lat, lon, prev_stop, threshold = 30): #proximity of 30m
                 closest_stop = stop_name
                 closest_distance = distance
 
+    #if there is more than one stop in proximity
     if len(candidates) > 1 and prev_stop:
         #failsafe to check and differentiate between lot I and ABB
         for stop_name, _ in candidates:
@@ -56,12 +70,52 @@ def find_stop(lat, lon, prev_stop, threshold = 30): #proximity of 30m
             if expected_prev == prev_stop:
                 return stop_name
 
+    #combines inner and outter lot M - remove when accounting for this
+    if closest_stop == "Inside Lot M":
+        closest_stop = "Lot M"
+
     return closest_stop #none if not within threshold
 
-def get_eta(lat, lon, time, stop):
+#this for now will be hard-coded - later you could add the prediction logic
+#returns a number which is the eta in minutes
+def get_eta(lat, lon, stop, prev_stop): # stop is the current stop - none if not at one
+
+    next_stop = None
+
+    #if currently at stop return travel time to next stop
+    if stop is not None:
+
+        #gets the next stop based on the current stop
+        for candidate_stop, prev_list in STOP_ORDER.items():
+            if stop in prev_list:
+                next_stop = candidate_stop
+                break
+        
+        if next_stop:
+            eta = STOP_TIMES.get((stop, next_stop))
+            if eta is not None:
+                return eta
+        else:
+            return -1 #incase of error
 
 
+    #find next stop and estimate time till next stop
+    if stop is None and prev_stop is not None:
+       
+       #gets the next stop based on the previous stop
+        for candidate_stop, prev_list in STOP_ORDER.items():
+            if prev_stop in prev_list:
+                next_stop = candidate_stop
+                break
 
+        #checking to make sure the next stop was actually found
+        if next_stop and next_stop in stops:
+            stop_lat, stop_lon = stops[next_stop]
+            distance = get_distance(lat, lon, stop_lat, stop_lon)
 
-
-    return eta
+            #assuming average speed through campus of 10 km/h
+            time = (distance / 2.77778) / 60  #time in minutes
+            eta = math.ceil(time)
+            return eta
+        else:
+            return -1 #error occurred
