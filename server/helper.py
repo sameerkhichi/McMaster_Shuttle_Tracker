@@ -77,10 +77,11 @@ def find_stop(lat, lon, prev_stop, threshold = 30): #proximity of 30m
     return closest_stop #none if not within threshold
 
 #this for now will be hard-coded - later you could add the prediction logic
-#returns a number which is the eta in minutes
+#returns [eta in minutes, next stop]
 def get_eta(lat, lon, stop, prev_stop): # stop is the current stop - none if not at one
 
     next_stop = None
+    eta = []
 
     #if currently at stop return travel time to next stop
     if stop is not None:
@@ -92,7 +93,8 @@ def get_eta(lat, lon, stop, prev_stop): # stop is the current stop - none if not
                 break
         
         if next_stop:
-            eta = STOP_TIMES.get((stop, next_stop))
+            eta[0] = STOP_TIMES.get((stop, next_stop))
+            eta[1] = next_stop
             if eta is not None:
                 return eta
         else:
@@ -115,7 +117,8 @@ def get_eta(lat, lon, stop, prev_stop): # stop is the current stop - none if not
 
             #assuming average speed through campus of 10 km/h
             time = (distance / 2.77778) / 60  #time in minutes
-            eta = math.ceil(time)
+            eta[0] = math.ceil(time)
+            eta[1] = next_stop
             return eta
         else:
             return -1 #error occurred

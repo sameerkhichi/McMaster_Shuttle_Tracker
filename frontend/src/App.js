@@ -18,9 +18,9 @@ function App() {
       }
 
       getData();
-      const interval = setInterval(getData, 15000); //refresh data every 15 seconds
+      const interval = setInterval(getData, 30000); //refresh data every 30 seconds
 
-      return () => clearInterval(interval);//clearing the interval to reset timer
+      return () => clearInterval(interval); //clearing the interval to reset timer
   }, []);
 
 
