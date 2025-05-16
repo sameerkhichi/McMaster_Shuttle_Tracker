@@ -56,6 +56,7 @@ def find_stop(lat, lon, prev_stop, threshold = 30): #proximity of 30m
 
     for stop_name, (stop_lat, stop_lon) in stops.items():
         distance = get_distance(lat, lon, stop_lat, stop_lon)
+        print(f"[DEBUG] distance from current location to any of the stops: {distance}")
         if distance <= threshold:
             candidates.append((stop_name, distance))
             if distance < closest_distance:
@@ -114,6 +115,7 @@ def get_eta(lat, lon, stop, prev_stop): # stop is the current stop - none if not
         print(f"[DEBUG] prev_stop passed into get_eta: {prev_stop}")
         for candidate_stop, prev_list in STOP_ORDER.items():
             if prev_stop in prev_list:
+                print(f"[DEBUG] next stop being set to: {candidate_stop}")
                 next_stop = candidate_stop
                 break
 

@@ -76,8 +76,9 @@ def receive_gpsdata():
 
     if existing_location:
         #keeps track of the previous stop - if different from one stored in db
-        if nearest_stop != existing_location.nearest_stop and nearest_stop is not None:
-            existing_location.previous_stop = existing_location.nearest_stop
+        if nearest_stop != existing_location.nearest_stop or nearest_stop is None:
+            if existing_location.nearest_stop: #dont update the previous stop is the bus is still in transit
+                existing_location.previous_stop = existing_location.nearest_stop
             existing_location.nearest_stop = nearest_stop
             existing_location.next_stop = next_stop
         
