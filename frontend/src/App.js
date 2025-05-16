@@ -38,6 +38,7 @@ function App() {
             <h3 className="text-lg font-semibold mb-2">Bus ID: {bus.bus_id}</h3>
             {/*if the nearest_stop field is none or empty, its travelling to the next stop*/}
             <p><strong>Stop:</strong> {bus.nearest_stop ?? `En route to ${bus.next_stop}`}</p>
+            <p><strong>Next Stop:</strong> {bus.next_stop}</p>
             <p><strong>ETA:</strong> {bus.eta} minute(s)</p>
             <p><strong>Last Updated:</strong> {new Date(bus.time_stamp).toLocaleTimeString()}</p>
           </div>

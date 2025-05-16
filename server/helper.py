@@ -81,7 +81,7 @@ def find_stop(lat, lon, prev_stop, threshold = 30): #proximity of 30m
 def get_eta(lat, lon, stop, prev_stop): # stop is the current stop - none if not at one
 
     next_stop = None
-    eta = []
+    eta = [None, None]
 
     #if currently at stop return travel time to next stop
     if stop is not None:
@@ -98,13 +98,20 @@ def get_eta(lat, lon, stop, prev_stop): # stop is the current stop - none if not
             if eta is not None:
                 return eta
         else:
-            return -1 #incase of error
-
+            return -1, None #incase of error
 
     #find next stop and estimate time till next stop
     if stop is None and prev_stop is not None:
-       
-       #gets the next stop based on the previous stop
+        #gets the next stop based on the previous stop
+        
+        #if its the first time its seeing the bus it should set the previous stop before blowing up - this dumb thing ruined me
+        if prev_stop == "N/A":
+            if stop is not None:
+                prev_stop = stop
+            else:
+                prev_stop = "Lot P" #Assuming busses start inside lot M their first stop should be lot P
+
+        print(f"[DEBUG] prev_stop passed into get_eta: {prev_stop}")
         for candidate_stop, prev_list in STOP_ORDER.items():
             if prev_stop in prev_list:
                 next_stop = candidate_stop
@@ -115,10 +122,12 @@ def get_eta(lat, lon, stop, prev_stop): # stop is the current stop - none if not
             stop_lat, stop_lon = stops[next_stop]
             distance = get_distance(lat, lon, stop_lat, stop_lon)
 
+            print(f"[DEBUG] checking distance calculated: {distance}")
             #assuming average speed through campus of 10 km/h
             time = (distance / 2.77778) / 60  #time in minutes
+            print(f"[DEBUG] checking the time calculated: {time}")
             eta[0] = math.ceil(time)
             eta[1] = next_stop
             return eta
         else:
-            return -1 #error occurred
+            return -1, None #error occurred

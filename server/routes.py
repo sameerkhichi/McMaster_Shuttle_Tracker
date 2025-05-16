@@ -63,16 +63,21 @@ def receive_gpsdata():
     #inserting the new location - if the bus_id already exists then just update its location
     #Have to use mysql command: ALTER TABLE bus_locations ADD CONSTRAINT unique_bus UNIQUE (bus_id);
     existing_location = BusLocation.query.filter_by(bus_id=bus_id).first() #returns first matching record
-    
-    nearest_stop = helper.find_stop(latitude, longitude, existing_location.prev_stop)
-    next_info = helper.get_eta(latitude, longitude, nearest_stop, existing_location.prev_stop)
+
+    if existing_location:
+        previous_stop = existing_location.previous_stop
+    else:
+        previous_stop = None  #No previous stop if new bus
+
+    nearest_stop = helper.find_stop(latitude, longitude, previous_stop)
+    next_info = helper.get_eta(latitude, longitude, nearest_stop, previous_stop)
     eta = next_info[0]
     next_stop = next_info[1]
 
     if existing_location:
         #keeps track of the previous stop - if different from one stored in db
         if nearest_stop != existing_location.nearest_stop and nearest_stop is not None:
-            existing_location.prev_stop = existing_location.nearest_stop
+            existing_location.previous_stop = existing_location.nearest_stop
             existing_location.nearest_stop = nearest_stop
             existing_location.next_stop = next_stop
         
