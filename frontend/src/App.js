@@ -2,6 +2,7 @@ import './App.css';
 import React, { useEffect, useState } from "react";
 import { fetchBusLocations } from './api';
 import map from "./images/mcmaster-parking-map.pdf"
+import bus_icon from "./images/bus-icon.png"
 
 
 function App() {
@@ -32,14 +33,13 @@ function App() {
         <h2 className="text-xl font-semibold">Active Shuttles: {busLocations.length}</h2>
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
+      <div className="flex gap-4 overflow-x-auto flex-nowrap scrollbar-hide snap-x snap-mandatory px-1">
         {busLocations.map((bus, index) => (
-          <div key={index} className="rounded-xl shadow-md p-4 border">
-            <h3 className="text-lg font-semibold mb-2">Bus ID: {bus.bus_id}</h3>
+          <div key={index} className="min-w-[300px] rounded-xl shadow-md p-4 border shrink-0 snap-start">
+            <img src={bus_icon} alt="icon" width="150" height="85"/>
             {/*if the nearest_stop field is none or empty, its travelling to the next stop*/}
-            <p><strong>Stop:</strong> {bus.nearest_stop ?? `En route to ${bus.next_stop}`}</p>
-            <p><strong>Next Stop:</strong> {bus.next_stop}</p>
-            <p><strong>ETA:</strong> {bus.eta} minute(s)</p>
+            <p><strong>Currently:</strong> {bus.nearest_stop ? `At ${bus.nearest_stop}` : `En route to ${bus.next_stop}`}</p>
+            <p><strong>ETA:</strong> {bus.eta} minute(s) to {bus.next_stop}</p>
             <p><strong>Last Updated:</strong> {new Date(bus.time_stamp).toLocaleTimeString()}</p>
           </div>
         ))}
