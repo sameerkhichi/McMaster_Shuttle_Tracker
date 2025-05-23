@@ -4,46 +4,53 @@ import { fetchBusLocations } from './api';
 import map from "./images/mcmaster-parking-map.pdf"
 import bus_icon from "./images/bus-icon.png"
 
-
 function App() {
   const [busLocations, setBusLocations] = useState([]);
 
   useEffect(() => {
-      async function getData() {
-          const data = await fetchBusLocations(); //get the bus locations as a json response
-          setBusLocations(data);
-      }
+    async function getData() {
+      const data = await fetchBusLocations();
+      setBusLocations(data);
+    }
 
-      getData();
-      const interval = setInterval(getData, 30000); //refresh data every 30 seconds
-
-      return () => clearInterval(interval); //clearing the interval to reset timer
+    getData();
+    const interval = setInterval(getData, 30000);
+    return () => clearInterval(interval);
   }, []);
 
-
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">McMaster Parking Shuttle Buses</h1>
+    <div className="min-h-screen bg-white text-gray-900 font-sans">
+      {/* Header */}
+      <header className="bg-[#7A003C] text-white py-6 shadow-md">
+        <h1 className="text-4xl font-bold text-center">McMaster Parking Shuttle Buses</h1>
+      </header>
 
-      <div className="mb-6">
-        <img src={map} alt="Map" width="800" height="600" />
-      </div>
+      <main className="p-6">
+        {/* Map Image */}
+        <div className="mb-8 flex justify-center">
+          <img src={map} alt="McMaster Parking Map" width="800" height="600" className="rounded shadow-lg" />
+        </div>
 
-      <div className="mb-4">
-        <h2 className="text-xl font-semibold">Active Shuttles: {busLocations.length}</h2>
-      </div>
+        {/* Shuttle Count */}
+        <div className="mb-6 text-center">
+          <h2 className="text-2xl font-semibold">
+            Active Shuttles:{" "}
+            <span className="text-[#FDBF57]">{busLocations.length}</span>
+          </h2>
+        </div>
 
-      <div className="flex gap-4 overflow-x-auto flex-nowrap scrollbar-hide snap-x snap-mandatory px-1">
-        {busLocations.map((bus, index) => (
-          <div key={index} className="min-w-[300px] rounded-xl shadow-md p-4 border shrink-0 snap-start">
-            <img src={bus_icon} alt="icon" width="150" height="85"/>
-            {/*if the nearest_stop field is none or empty, its travelling to the next stop*/}
-            <p><strong>Currently:</strong> {bus.nearest_stop ? `At ${bus.nearest_stop}` : `En route to ${bus.next_stop}`}</p>
-            <p><strong>ETA:</strong> {bus.eta} minute(s) to {bus.next_stop}</p>
-            <p><strong>Last Updated:</strong> {new Date(bus.time_stamp).toLocaleTimeString()}</p>
-          </div>
-        ))}
-      </div>
+        {/* Shuttle Cards */}
+        <div className="flex gap-4 overflow-x-auto flex-nowrap scrollbar-hide snap-x snap-mandatory px-1 pb-4">
+          {busLocations.map((bus, index) => (
+            <div key={index} className="min-w-[300px] bg-white border border-gray-200 rounded-xl shadow-md p-4 shrink-0 snap-start">
+              <img src={bus_icon} alt="Bus Icon" width="150" height="85" className="mx-auto mb-4" />
+              <p><strong>Currently:</strong> {bus.nearest_stop ? `At ${bus.nearest_stop}` : `En route to ${bus.next_stop}`}</p>
+              <p><strong>ETA:</strong> {bus.eta} minute(s) to {bus.next_stop}</p>
+              <p><strong>Last Updated:</strong> {new Date(bus.time_stamp).toLocaleTimeString()}</p>
+            </div>
+          ))}
+        </div>
+      </main>
     </div>
   );
 }
