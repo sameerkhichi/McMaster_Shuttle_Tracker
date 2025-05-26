@@ -16,6 +16,8 @@ def get_bus_locations():
     locations = BusLocation.query.all()
     bus_data = []
 
+    isRunningDict = helper.getBusRunningDict(locations)
+    
     for loc in locations:
         bus_data.append({
             "bus_id": loc.bus_id,
@@ -23,7 +25,8 @@ def get_bus_locations():
             "previous_stop": loc.previous_stop,
             "next_stop": loc.next_stop,
             "eta": loc.eta,
-            "time_stamp": loc.time_stamp
+            "time_stamp": loc.time_stamp,
+            "isRunning": isRunningDict.get(loc.bus_id, False) #defaults to false
         })
     
     #I tried adding this so that it would stop throwing an error when accessing it (it didnt)
@@ -57,8 +60,7 @@ def receive_gpsdata():
         return jsonify({"error": "Missing required fields"}), 400
 
     #owntracks sends tst time stamps in UNIX format whereas mysql expects DATETIME type YYYY-MM-DD HH:MM:SS
-    timestamp = datetime.utcfromtimestamp(timestamp) #universal time
-    timestamp = timestamp - timedelta(hours=4) #converting to EST for display and storage
+    timestamp = datetime.utcfromtimestamp(timestamp) #universal time - converted to local timezone on frontend
 
     #inserting the new location - if the bus_id already exists then just update its location
     #Have to use mysql command: ALTER TABLE bus_locations ADD CONSTRAINT unique_bus UNIQUE (bus_id);

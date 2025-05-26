@@ -1,4 +1,5 @@
 import math
+from datetime import datetime, timedelta, timezone
 
 #file to calculate eta and nearest stop given the lat and lon
 #in form of lat,lon
@@ -133,3 +134,16 @@ def get_eta(lat, lon, stop, prev_stop): # stop is the current stop - none if not
             return eta
         else:
             return -1, None #error occurred
+
+#Function that returns a dictionary of {bus_id: isRunning-true/false}
+def getBusRunningDict(locations):
+    now = datetime.now()  #naive datetime (still universal time)
+    running_dictionary = {}
+
+    for loc in locations:
+        originalTimeStamp = loc.time_stamp - timedelta(hours=4) #you need this otherwise loc.timetamp is 4 hours ahead - this ruined me
+        #loc.time_stamp is already naive and in EST — no need to convert timezone
+        is_running = (now - originalTimeStamp) <= timedelta(minutes=10)
+        running_dictionary[loc.bus_id] = is_running
+
+    return running_dictionary

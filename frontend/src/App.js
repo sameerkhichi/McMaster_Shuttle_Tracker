@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { fetchBusLocations } from './api';
 import map from "./images/mcmaster-parking-map.pdf"
 import bus_icon from "./images/bus-icon.png"
+import schedule from "./images/shuttle-schedule.png"
 
 function App() {
   const [busLocations, setBusLocations] = useState([]);
@@ -34,8 +35,7 @@ function App() {
         {/* Shuttle Count */}
         <div className="mb-6 text-center">
           <h2 className="text-2xl font-semibold">
-            Active Shuttles:{" "}
-            <span className="text-[#FDBF57]">{busLocations.length}</span>
+            Active Shuttles: {busLocations.filter(bus => bus.isRunning).length}
           </h2>
         </div>
 
@@ -46,7 +46,7 @@ function App() {
               <img src={bus_icon} alt="Bus Icon" width="150" height="85" className="mx-auto mb-4" />
               <p><strong>Currently:</strong> {bus.nearest_stop ? `At ${bus.nearest_stop}` : `En route to ${bus.next_stop}`}</p>
               <p><strong>ETA:</strong> {bus.eta} minute(s) to {bus.next_stop}</p>
-              <p><strong>Last Updated:</strong> {new Date(bus.time_stamp).toLocaleTimeString()}</p>
+              <p><strong>Last Updated:</strong> {new Date(bus.time_stamp).toLocaleTimeString()}</p> {/*toLocaleTimeString converts the universal time to the local timezone */}
             </div>
           ))}
         </div>
