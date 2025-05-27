@@ -142,8 +142,11 @@ def getBusRunningDict(locations):
 
     for loc in locations:
         originalTimeStamp = loc.time_stamp - timedelta(hours=4) #you need this otherwise loc.timetamp is 4 hours ahead - this ruined me
-        #loc.time_stamp is already naive and in EST — no need to convert timezone
         is_running = (now - originalTimeStamp) <= timedelta(minutes=10)
+
+        if loc.eta >= 30: #failsafe incase tracker is on and out of range of campus (reasoning on backend notes)
+            is_running = False
+
         running_dictionary[loc.bus_id] = is_running
 
     return running_dictionary
