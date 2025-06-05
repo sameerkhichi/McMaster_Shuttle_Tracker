@@ -33,6 +33,11 @@ STOP_TIMES = {
     ("Lot I", "MUSC"): 6 
 }
 
+#returns a list of valid next stops given a previous one
+def get_valid_next_stops(prev_stop):
+    return [stop for stop, allowed_prev in STOP_ORDER.items() if prev_stop in allowed_prev]
+
+
 #calculates the threshold - for proximity location - returns distance in meters from coordinates
 def get_distance(lat1, lon1, lat2, lon2):
     #Earth radius in meters
@@ -70,12 +75,23 @@ def find_stop(lat, lon, prev_stop, threshold = 30): #proximity of 30m
         for stop_name, _ in candidates:
             expected_prev = STOP_ORDER.get(stop_name, [])
             if expected_prev == prev_stop:
-                return stop_name
+                closest_stop = stop_name
+
+    expected_stop = get_valid_next_stops(prev_stop)
 
     #combines inner and outter lot M - remove when accounting for this
     if closest_stop == "Inside Lot M":
         closest_stop = "Lot M"
 
+    print(closest_stop)
+    print(expected_stop)
+
+    for items in expected_stop:
+        if items != closest_stop:
+            closest_stop = None
+
+    print(closest_stop)
+    
     return closest_stop #none if not within threshold
 
 #this for now will be hard-coded - later you could add the prediction logic
