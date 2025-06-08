@@ -96,6 +96,10 @@ def find_stop(lat, lon, prev_stop, threshold = 30): #proximity of 30m
     #Another bypass since A.B.B and lot I are 2 stops away if going towards MUSC and theyre very close together
     if closest_stop == "A.B.B" and prev_stop == "Lot M":
         closest_stop = "Lot I"
+    
+    #This is a bypass for after the bus becomes active again and starts at lot P
+    if closest_stop == "Lot P" and prev_stop == "Lot M":
+        return "Lot P"
 
     #if the closest stop isnt upcoming in the next two - ignore it
     if closest_stop and closest_stop not in valid_next_stops:
