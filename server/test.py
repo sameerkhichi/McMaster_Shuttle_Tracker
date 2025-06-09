@@ -6,7 +6,7 @@ from datetime import datetime
 BACKEND_URL = "http://localhost:5000/Live_Location"
 
 
-bus_id = "2"
+bus_id = "1"
 
 
 # Format: (lat, lon)

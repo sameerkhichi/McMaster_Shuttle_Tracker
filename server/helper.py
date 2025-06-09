@@ -101,6 +101,9 @@ def find_stop(lat, lon, prev_stop, threshold = 30): #proximity of 30m
     if closest_stop == "Lot P" and prev_stop == "Lot M":
         return "Lot P"
 
+    if prev_stop == "N/A":
+        return closest_stop
+    
     #if the closest stop isnt upcoming in the next two - ignore it
     if closest_stop and closest_stop not in valid_next_stops:
         closest_stop = None
@@ -137,10 +140,7 @@ def get_eta(lat, lon, stop, prev_stop): # stop is the current stop - none if not
         
         #if its the first time its seeing the bus it should set the previous stop before blowing up - this dumb thing ruined me
         if prev_stop == "N/A":
-            if stop is not None:
-                prev_stop = stop
-            else:
-                prev_stop = "Lot P" #Assuming busses start inside lot M their first stop should be lot P
+            return eta
 
         print(f"[DEBUG] prev_stop passed into get_eta: {prev_stop}")
         for candidate_stop, prev_list in STOP_ORDER.items():
@@ -177,8 +177,11 @@ def getBusRunningDict(locations):
     for loc in locations:
         originalTimeStamp = loc.time_stamp - timedelta(hours=4) #you need this otherwise loc.timetamp is 4 hours ahead - this ruined me
         is_running = (now - originalTimeStamp) <= timedelta(minutes=10)
-
-        if loc.eta >= 30: #failsafe incase tracker is on and out of range of campus (reasoning on backend notes)
+        
+        if loc.next_stop is not None:
+            if loc.eta >= 30: #failsafe incase tracker is on and out of range of campus (reasoning on backend notes)
+                is_running = False
+        else: 
             is_running = False
 
         running_dictionary[loc.bus_id] = is_running

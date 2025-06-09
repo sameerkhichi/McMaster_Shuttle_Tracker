@@ -7,8 +7,8 @@ class BusLocation(db.Model):
     bus_id = db.Column(db.String(50), primary_key=True)
     nearest_stop = db.Column(db.String(100), nullable = True)
     previous_stop = db.Column(db.String(100), nullable = False)
-    next_stop = db.Column(db.String(100), nullable = False)
-    eta = db.Column(db.Integer, nullable = False)
+    next_stop = db.Column(db.String(100), nullable = True)
+    eta = db.Column(db.Integer, nullable = True)
     time_stamp = db.Column(db.DateTime, nullable = False)
 
     def __repr__(self):

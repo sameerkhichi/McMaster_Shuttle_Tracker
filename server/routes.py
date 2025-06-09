@@ -72,9 +72,10 @@ def receive_gpsdata():
         previous_stop = None  #No previous stop if new bus
 
     nearest_stop = helper.find_stop(latitude, longitude, previous_stop)
-    next_info = helper.get_eta(latitude, longitude, nearest_stop, previous_stop)
-    eta = next_info[0]
-    next_stop = next_info[1]
+    if existing_location:
+        next_info = helper.get_eta(latitude, longitude, nearest_stop, previous_stop)
+        eta = next_info[0]
+        next_stop = next_info[1]
 
     if existing_location:
         #keeps track of the previous stop - if different from one stored in db
@@ -94,7 +95,7 @@ def receive_gpsdata():
         existing_location.eta = eta
         existing_location.time_stamp = timestamp
     else:
-        new_location = BusLocation(bus_id=bus_id, nearest_stop=nearest_stop, previous_stop="N/A", next_stop=next_stop, eta=eta, time_stamp=timestamp) 
+        new_location = BusLocation(bus_id=bus_id, nearest_stop=nearest_stop, previous_stop="N/A", next_stop=None, eta=None, time_stamp=timestamp) 
         db.session.add(new_location)
     
 
