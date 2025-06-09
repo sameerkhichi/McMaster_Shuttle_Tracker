@@ -2,8 +2,8 @@ import './App.css';
 import React, { useEffect, useState } from "react";
 import { fetchBusLocations } from './api';
 import map from "./images/mcmaster-parking-map.pdf"
-import bus_icon from "./images/bus-icon.png"
 import schedule from "./images/shuttle-schedule.png"
+import ShuttleCard from './components/ShuttleCard';
 
 function App() {
   const [busLocations, setBusLocations] = useState([]);
@@ -41,13 +41,10 @@ function App() {
 
         {/* Shuttle Cards */}
         <div className="flex gap-4 overflow-x-auto flex-nowrap scrollbar-hide snap-x snap-mandatory px-1 pb-4">
-          {busLocations.map((bus, index) => (
-            <div key={index} className="min-w-[300px] bg-white border border-gray-200 rounded-xl shadow-md p-4 shrink-0 snap-start">
-              <img src={bus_icon} alt="Bus Icon" width="150" height="85" className="mx-auto mb-4" />
-              <p><strong>Currently:</strong> {bus.nearest_stop ? `At ${bus.nearest_stop}` : `En route to ${bus.next_stop}`}</p>
-              <p><strong>ETA:</strong> {bus.eta} minute(s) to {bus.next_stop}</p>
-              <p><strong>Last Updated:</strong> {new Date(bus.time_stamp).toLocaleTimeString()}</p> {/*toLocaleTimeString converts the universal time to the local timezone */}
-            </div>
+          {busLocations.map((bus) => (
+            bus.isRunning && (
+              <ShuttleCard bus={bus} key={bus.bus_id} />
+            )
           ))}
         </div>
       </main>
