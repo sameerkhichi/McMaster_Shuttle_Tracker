@@ -1,3 +1,4 @@
 configuration/
 .env
 __pycache__/
+*.pyc

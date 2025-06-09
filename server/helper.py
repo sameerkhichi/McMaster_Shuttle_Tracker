@@ -77,20 +77,33 @@ def find_stop(lat, lon, prev_stop, threshold = 30): #proximity of 30m
             if expected_prev == prev_stop:
                 closest_stop = stop_name
 
+    #gets a list of valid next stops
     expected_stop = get_valid_next_stops(prev_stop)
+    second_expected_stop = get_valid_next_stops(expected_stop)
+    third_expected_stop = get_valid_next_stops(second_expected_stop)
 
     #combines inner and outter lot M - remove when accounting for this
     if closest_stop == "Inside Lot M":
         closest_stop = "Lot M"
 
-    print(closest_stop)
-    print(expected_stop)
+    #combines valid next stops with up to two skipped stops allowed - cross checks for the next two upcoming stops
+    valid_next_stops = expected_stop + second_expected_stop + third_expected_stop
 
-    for items in expected_stop:
-        if items != closest_stop:
-            closest_stop = None
+    #this is a bypass for lot P since its too close to lot M if lot M gets picked up, it will self correct when it gets to lot p or m
+    if closest_stop == "Lot M" and prev_stop == "Mary Keyes":
+        closest_stop = "Lot P"
 
-    print(closest_stop)
+    #Another bypass since A.B.B and lot I are 2 stops away if going towards MUSC and theyre very close together
+    if closest_stop == "A.B.B" and prev_stop == "Lot M":
+        closest_stop = "Lot I"
+    
+    #This is a bypass for after the bus becomes active again and starts at lot P
+    if closest_stop == "Lot P" and prev_stop == "Lot M":
+        return "Lot P"
+
+    #if the closest stop isnt upcoming in the next two - ignore it
+    if closest_stop and closest_stop not in valid_next_stops:
+        closest_stop = None
     
     return closest_stop #none if not within threshold
 
@@ -135,6 +148,11 @@ def get_eta(lat, lon, stop, prev_stop): # stop is the current stop - none if not
                 print(f"[DEBUG] next stop being set to: {candidate_stop}")
                 next_stop = candidate_stop
                 break
+        
+        #check if a stop is skipped - if it is set the correct stop
+        skip_a_stop = did_they_skip_a_stop(lat, lon, next_stop)
+        if skip_a_stop:
+            next_stop = skip_a_stop
 
         #checking to make sure the next stop was actually found
         if next_stop and next_stop in stops:
@@ -166,3 +184,44 @@ def getBusRunningDict(locations):
         running_dictionary[loc.bus_id] = is_running
 
     return running_dictionary
+
+
+"""
+Checks if the bus has skipped the expected next stop by analyzing distance to 
+the next and next-next stops. If it is already 25% of the way to the second stop
+and more than 100m from the first, it likely skipped the first.
+
+Returns:
+    The actual next stop name if skipped, otherwise None.
+"""
+def did_they_skip_a_stop(lat, lon, next_stop):
+
+    actual_next_stop = None #will be set as the stop it actually is going to
+    second_stop_list = get_valid_next_stops(next_stop)
+    if not second_stop_list:
+        return None
+
+    second_stop = second_stop_list[0]
+    next_stop_lat, next_stop_lon = stops[next_stop]
+    second_stop_lat, second_stop_lon = stops[second_stop]
+
+    dist_to_first_stop = get_distance(lat, lon, next_stop_lat, next_stop_lon)
+    dist_to_second_stop = get_distance(lat, lon, second_stop_lat, second_stop_lon)
+    dist_between_stops = get_distance(next_stop_lat, next_stop_lon, second_stop_lat, second_stop_lon)
+
+    conditional_threshold = 0.75*dist_between_stops
+    
+    #checking if the bus has traveled about a quarter of the way past the 'next stop'
+    #the distance to the first stop should be more than 100 meters away as an extra check
+    if dist_to_second_stop <= conditional_threshold and dist_to_first_stop >= 100:
+        actual_next_stop = second_stop
+
+    #if the next stop is lot p ignore since its too close to lot m to tell (i gave up if you couldnt tell)
+    if next_stop == "Lot P":
+        actual_next_stop = None
+    
+    #Lot M is almost never skipped - and A.B.B is too close to Lot I to use this logic
+    if next_stop == "MUSC":
+        actual_next_stop = None
+
+    return actual_next_stop # none if stop is not skipped
