@@ -61,8 +61,9 @@ def find_stop(lat, lon, prev_stop, threshold = 30): #proximity of 30m
     candidates = []
 
     for stop_name, (stop_lat, stop_lon) in stops.items():
+
         distance = get_distance(lat, lon, stop_lat, stop_lon)
-        print(f"[DEBUG] distance from current location to any of the stops: {distance}")
+
         if distance <= threshold:
             candidates.append((stop_name, distance))
             if distance < closest_distance:
@@ -111,11 +112,12 @@ def find_stop(lat, lon, prev_stop, threshold = 30): #proximity of 30m
     return closest_stop #none if not within threshold
 
 #this for now will be hard-coded - later you could add the prediction logic
-#returns [eta in minutes, next stop]
+#returns [eta in minutes, next stop, skipped stop], skipped stop is none if the bus never skipped a stop
 def get_eta(lat, lon, stop, prev_stop): # stop is the current stop - none if not at one
 
     next_stop = None
-    eta = [None, None]
+    skipped_stop = None
+    eta = [None, None, None]
 
     #if currently at stop return travel time to next stop
     if stop is not None:
@@ -132,7 +134,7 @@ def get_eta(lat, lon, stop, prev_stop): # stop is the current stop - none if not
             if eta is not None:
                 return eta
         else:
-            return -1, None #incase of error
+            return -1, None, None #incase of error
 
     #find next stop and estimate time till next stop
     if stop is None and prev_stop is not None:
@@ -149,10 +151,14 @@ def get_eta(lat, lon, stop, prev_stop): # stop is the current stop - none if not
                 next_stop = candidate_stop
                 break
         
+        #these variable names are wack - trust me I know
         #check if a stop is skipped - if it is set the correct stop
         skip_a_stop = did_they_skip_a_stop(lat, lon, next_stop)
+        #if skipped track what stop was skipped and what stop is actually next
         if skip_a_stop:
+            skipped_stop = next_stop
             next_stop = skip_a_stop
+            print(f"DEBUG: stop was skipped - next stop is now: {next_stop}")
 
         #checking to make sure the next stop was actually found
         if next_stop and next_stop in stops:
@@ -165,9 +171,12 @@ def get_eta(lat, lon, stop, prev_stop): # stop is the current stop - none if not
             print(f"[DEBUG] checking the time calculated: {time}")
             eta[0] = math.ceil(time)
             eta[1] = next_stop
+            if skipped_stop:
+                eta[2] = skipped_stop
+            print(eta[2])
             return eta
         else:
-            return -1, None #error occurred
+            return -1, None, None #error occurred
 
 #Function that returns a dictionary of {bus_id: isRunning-true/false}
 def getBusRunningDict(locations):
