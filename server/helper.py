@@ -165,10 +165,8 @@ def get_eta(lat, lon, stop, prev_stop): # stop is the current stop - none if not
             stop_lat, stop_lon = stops[next_stop]
             distance = get_distance(lat, lon, stop_lat, stop_lon)
 
-            print(f"[DEBUG] checking distance calculated: {distance}")
             #assuming average speed through campus of 10 km/h
             time = (distance / 2.77778) / 60  #time in minutes
-            print(f"[DEBUG] checking the time calculated: {time}")
             eta[0] = math.ceil(time)
             eta[1] = next_stop
             if skipped_stop:
