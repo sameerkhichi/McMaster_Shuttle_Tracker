@@ -7,13 +7,13 @@ function BusStopCard({ stopName, buses }) {
                 <img src={pin} className="w-7 pb-1" />
                 <h3 className="text-xl font-bold mb-2 px-1">{stopName}</h3>
             </div>
-            <div className="p-3">
+            <div className="p-3 font-arial">
                 {buses.length === 0 ? (
                     <p className="text-gray-500">No buses en route.</p>
                 ) : (
                     <ul className="space-y-1">
                     {buses.map(bus => (
-                        <li key={bus.id} className="text-sm">
+                        <li key={bus.id} className="text-md">
                         Bus #{bus.id} - arriving at <strong>{bus.arrivalTime}</strong> ({bus.totalEta} min)
                         </li>
                     ))}
