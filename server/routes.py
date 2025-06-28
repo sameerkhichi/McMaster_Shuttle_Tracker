@@ -29,8 +29,8 @@ def get_bus_locations():
             "isRunning": isRunningDict.get(loc.bus_id, False) #defaults to false
         })
     
-    #I tried adding this so that it would stop throwing an error when accessing it (it didnt)
-    #but this does stop different versioning of http headers
+
+    #This stops different versioning of http headers
     response = make_response(jsonify(bus_data), 200)
     response.headers["Content-Type"] = "application/json"
     response.headers["Cache-Control"] = "no-cache"
@@ -76,6 +76,8 @@ def receive_gpsdata():
         next_info = helper.get_eta(latitude, longitude, nearest_stop, previous_stop)
         eta = next_info[0]
         next_stop = next_info[1]
+        if next_info[2]:
+            existing_location.previous_stop = next_info[2]
 
     if existing_location:
         #keeps track of the previous stop - if different from one stored in db
@@ -87,6 +89,8 @@ def receive_gpsdata():
                 next_info = helper.get_eta(latitude, longitude, nearest_stop, existing_location.previous_stop)
                 eta = next_info[0]
                 next_stop = next_info[1]
+                if next_info[2]:
+                    existing_location.previous_stop = next_info[2]
 
             existing_location.nearest_stop = nearest_stop
             existing_location.next_stop = next_stop
