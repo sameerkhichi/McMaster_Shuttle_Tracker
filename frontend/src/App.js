@@ -11,6 +11,7 @@ function App() {
   useEffect(() => {
     async function getData() {
       const data = await fetchBusLocations();
+      console.log("Fetched bus locations:", data); // Temp
       setBusLocations(data);
     }
 
@@ -28,12 +29,12 @@ function App() {
 
       <Routes>
         <Route path="/" element={<Home busLocations={busLocations} />} />
-        <Route path="/times" element={<BusStopETAList />} />
+        <Route path="/times" element={<BusStopETAList busLocations={busLocations}/>} />
       </Routes>
 
-      <nav className="bg-white fixed bottom-0 left-0 right-0 border-t border-gray-300 shadow-md flex h-16 z-50">
-        <Link to="/" className="w-1/2 flex items-center justify-center border-r">Home</Link>
-        <Link to="/times" className="w-1/2 flex items-center justify-center border-l">Times</Link>
+      <nav className="bg-white fixed bottom-0 left-0 right-0 border-t border-gray-300 flex h-16 z-50 font-semibold">
+        <Link to="/" className="w-1/2 flex items-center justify-center border-r hover:bg-gray-200">Home</Link>
+        <Link to="/times" className="w-1/2 flex items-center justify-center border-l hover:bg-gray-200">Times</Link>
       </nav>
     </div>
   );
