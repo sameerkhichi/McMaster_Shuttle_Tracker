@@ -1,5 +1,6 @@
 import math
 from datetime import datetime, timedelta, timezone
+from models import db
 
 #file to calculate eta and nearest stop given the lat and lon
 #in form of lat,lon
@@ -54,7 +55,7 @@ def get_distance(lat1, lon1, lat2, lon2):
     return R * c  #distance in meters
 
 #returns the closest stop - on frontend it will display it as there or as 'next stop'
-def find_stop(lat, lon, prev_stop, threshold = 50): #proximity of 50m
+def find_stop(lat, lon, prev_stop, threshold = 40): #proximity of 40m
 
     closest_stop = None
     closest_distance = float('inf')
@@ -176,10 +177,12 @@ def get_eta(lat, lon, stop, prev_stop): # stop is the current stop - none if not
         else:
             return -1, None, None #error occurred
 
+#THIS FUNCTION HAS THE ABILITY TO MODIFY THE DATABASE - resets previous stop when bus becomes inactive
 #Function that returns a dictionary of {bus_id: isRunning-true/false}
 def getBusRunningDict(locations):
     now = datetime.now()  #naive datetime (still universal time)
     running_dictionary = {}
+    reset_needed = False
 
     for loc in locations:
         originalTimeStamp = loc.time_stamp - timedelta(hours=4) #you need this otherwise loc.timetamp is 4 hours ahead - this ruined me
@@ -191,7 +194,19 @@ def getBusRunningDict(locations):
         else: 
             is_running = False
 
+        # If bus is not running, reset previous stop
+        if not is_running and loc.previous_stop != "N/A":
+            loc.previous_stop = "N/A"
+            reset_needed = True
+
+        # If previous stop is "N/A", do not mark it as running
+        if loc.previous_stop == "N/A":
+            is_running = False
+
         running_dictionary[loc.bus_id] = is_running
+
+    if reset_needed:
+        db.session.commit()
 
     return running_dictionary
 

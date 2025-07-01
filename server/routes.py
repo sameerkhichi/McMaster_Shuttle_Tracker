@@ -44,6 +44,7 @@ def get_bus_locations():
 def receive_gpsdata():
     
     data = request.json #owntracks sends json data
+    update_prev_loc = True
 
     #this is basically checking and making sure the data being sent to the server is an actual location
     #making sure the data sent is of type location cuz owntracks can be a little silly
@@ -84,7 +85,19 @@ def receive_gpsdata():
         if nearest_stop != existing_location.nearest_stop or nearest_stop is None:
 
             if existing_location.nearest_stop: #dont update the previous stop is the bus is still in transit
-                existing_location.previous_stop = existing_location.nearest_stop
+                
+                #if the bus is newly active - avoid updating previous location till its at a stop
+                if existing_location.previous_stop == "N/A" and nearest_stop is None:
+                    update_prev_loc = False
+                
+                #if newly active but at a stop - this forces system to use newly calculated stop rather than the one in the database
+                if existing_location.previous_stop == "N/A" and nearest_stop is not None:
+                    existing_location.previous_stop = nearest_stop
+                    update_prev_loc = False
+                
+                #otherwise just update like normal
+                if update_prev_loc:
+                    existing_location.previous_stop = existing_location.nearest_stop
                 #runs the calculation again for the next stop info when previous stop is updated
                 next_info = helper.get_eta(latitude, longitude, nearest_stop, existing_location.previous_stop)
                 eta = next_info[0]
