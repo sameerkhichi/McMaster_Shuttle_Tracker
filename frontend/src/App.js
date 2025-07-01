@@ -2,6 +2,7 @@ import './css/App.css';
 import React, { useEffect, useState } from "react";
 import { fetchBusLocations } from './api';
 import { Routes,Route,Link,useLocation } from 'react-router-dom'
+import logo from './images/mcmaster-logo.png'
 import Home from './pages/Home'
 import BusStopETAList from './pages/BusStopETAList';
 
@@ -26,7 +27,16 @@ function App() {
     <div className="min-h-screen bg-white text-gray-900 font-sans pb-16">
       {/* Header */}
       <header className="bg-[#7A003C] text-white py-6 shadow-md px-5">
-        <h1 className="text-2xl font-bold text-center">McMaster Parking Shuttle Buses</h1>
+        <div className="relative flex items-center justify-center">
+          <img 
+            src={logo} 
+            alt="McMaster Logo" 
+            width="80" 
+            height="80" 
+            className="absolute left-0 top-1/2 transform -translate-y-11"
+          />
+          <h1 className="text-2xl font-bold text-center">McMaster Parking Shuttle Buses</h1>
+        </div>
       </header>
 
       <Routes>

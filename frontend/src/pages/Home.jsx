@@ -1,4 +1,4 @@
-import map from "../images/mcmaster-parking-map.pdf"
+import map from "../images/mcmaster-parking-map.png"
 import ShuttleCard from '../components/ShuttleCard';
 
 function Home({ busLocations }) {
@@ -25,6 +25,12 @@ function Home({ busLocations }) {
                 )
                 ))}
             </div>
+
+            {/* Disclaimer Footer */}
+            <footer className="text-center text-xs text-gray-500 mt-10 mb-4">
+            Forgive us if we're a few minutes late - ETA varies during peak campus hours
+            </footer>
+
         </main>
     );
 }

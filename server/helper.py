@@ -54,7 +54,7 @@ def get_distance(lat1, lon1, lat2, lon2):
     return R * c  #distance in meters
 
 #returns the closest stop - on frontend it will display it as there or as 'next stop'
-def find_stop(lat, lon, prev_stop, threshold = 30): #proximity of 30m
+def find_stop(lat, lon, prev_stop, threshold = 50): #proximity of 50m
 
     closest_stop = None
     closest_distance = float('inf')
