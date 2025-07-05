@@ -1,13 +1,24 @@
 #note that these routes arent designed for http theyre just api endpoints which work from terminal and react frontend
 #there could be unexpected request formats, react and curl work fine so it shouldnt be a problem
 #just dont try accessing the api endpoints through a raw browser
-from flask import Flask, request, Blueprint, jsonify, make_response
+from flask import Flask, request, Blueprint, jsonify, make_response, send_from_directory, current_app
 from models import db, BusLocation
 from datetime import datetime, timedelta, timezone
 import helper
 
 #blueprints for the routes
 app_routes = Blueprint('app_routes', __name__)
+
+#base url root - we dont have an html root, the flask server is just for api endpoints
+#this route and function serves the react app through the flask server so I can host them together rather than seperately 
+@app_routes.route('/')
+def home():
+
+    return send_from_directory(current_app.static_folder, "index.html")
+
+@app_routes.route("/<path:path>")
+def catch_all(path):
+    return send_from_directory(current_app.static_folder, "index.html")
 
 @app_routes.route('/update', methods=['GET'])
 def get_bus_locations():
@@ -119,10 +130,3 @@ def receive_gpsdata():
     db.session.commit()
 
     return jsonify({"message": "Location updated"}), 200
-
-
-#base url root - we dont have an html root, the flask server is just for api endpoints
-@app_routes.route('/')
-def web_interface():
-
-    return "Flask server is running, use this server for API endpoint calls"

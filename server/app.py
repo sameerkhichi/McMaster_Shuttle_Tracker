@@ -4,7 +4,7 @@ from models import db
 from flask_cors import CORS
 
 #initializing flask and the database
-app = Flask(__name__)
+app = Flask(__name__, static_folder="../frontend/build", static_url_path="/")
 #CORS allows for frontend request without missmatch (localhost 3000 and 5000)
 CORS(app)
 app.config.from_object('configuration.config')
@@ -23,5 +23,6 @@ def handle_error_badRequest(e):
 
 #for debugging
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True) #making flask accessible to other devices
+    app.run() #without debug mode
+    # app.run(host='0.0.0.0', port=5000, debug=True) #making flask accessible to other devices
     #app.run(debug=True, threaded=True) #threaded stops bad versioned requests
