@@ -1,6 +1,6 @@
 import math
 from datetime import datetime, timedelta, timezone
-from models import db
+from server.models import db
 
 #file to calculate eta and nearest stop given the lat and lon
 #in form of lat,lon

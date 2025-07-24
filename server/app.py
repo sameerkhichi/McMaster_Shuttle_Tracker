@@ -1,6 +1,6 @@
 from flask import Flask, jsonify
-from routes import app_routes
-from models import db
+from server.routes import app_routes
+from server.models import db
 from flask_cors import CORS
 
 from dotenv import load_dotenv

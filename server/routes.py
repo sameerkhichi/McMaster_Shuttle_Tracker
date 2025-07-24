@@ -2,9 +2,9 @@
 #there could be unexpected request formats, react and curl work fine so it shouldnt be a problem
 #just dont try accessing the api endpoints through a raw browser
 from flask import Flask, request, Blueprint, jsonify, make_response, send_from_directory, current_app
-from models import db, BusLocation
+from server.models import db, BusLocation
 from datetime import datetime, timedelta, timezone
-import helper
+from server import helper
 
 #blueprints for the routes
 app_routes = Blueprint('app_routes', __name__)

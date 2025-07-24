@@ -13,7 +13,8 @@ services:
       npm install
       npm run build
       cd ..
-    startCommand: gunicorn server.app:app
+      cd server
+    startCommand: gunicorn app:app
     envVars:
       - key: MYSQL_URI
         value: null 
