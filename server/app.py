@@ -12,7 +12,7 @@ app = Flask(__name__, static_folder="../frontend/build", static_url_path="/")
 
 #CORS allows for frontend request without missmatch (localhost 3000 and 5000)
 CORS(app)
-app.config.from_object('configuration.config')
+app.config.from_object('server.configuration.config')
 app.register_blueprint(app_routes)
 db.init_app(app)
 
