@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: McMaster-Shuttle-Tracker
+    env: python
+    repo: https://github.com/sameerkhichi/McMaster_Shuttle_Tracker
+    branch: main
+    buildCommand: |
+      # Install backend dependencies
+      pip install -r requirements.txt
+
+      # Build React frontend
+      cd frontend
+      npm install
+      npm run build
+      cd ..
+    startCommand: gunicorn app:app
+    envVars:
+      - key: MYSQL_URI
+        value: null 

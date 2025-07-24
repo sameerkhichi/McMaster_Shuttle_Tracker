@@ -3,8 +3,13 @@ from routes import app_routes
 from models import db
 from flask_cors import CORS
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 #initializing flask and the database
 app = Flask(__name__, static_folder="../frontend/build", static_url_path="/")
+
 #CORS allows for frontend request without missmatch (localhost 3000 and 5000)
 CORS(app)
 app.config.from_object('configuration.config')
@@ -20,9 +25,10 @@ with app.app_context():
 def handle_error_badRequest(e):
     return jsonify({"error": "Bad Request", "message": str(e)}), 400
 
-
-#for debugging
+"""
+#for debugging - REMOVE THIS UPON DEPLOYMENT
 if __name__ == '__main__':
     app.run() #without debug mode
     # app.run(host='0.0.0.0', port=5000, debug=True) #making flask accessible to other devices
     #app.run(debug=True, threaded=True) #threaded stops bad versioned requests
+"""
