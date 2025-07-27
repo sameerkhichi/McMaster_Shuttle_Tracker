@@ -1,5 +1,6 @@
 import math
 from datetime import datetime, timedelta, timezone
+from flask import current_app, jsonify
 from server.models import db
 
 #file to calculate eta and nearest stop given the lat and lon
@@ -206,7 +207,12 @@ def getBusRunningDict(locations):
         running_dictionary[loc.bus_id] = is_running
 
     if reset_needed:
-        db.session.commit()
+        try:
+            db.session.commit()
+        except Exception as e:
+            current_app.logger.error(f"Commit failed: {e}")
+            db.session.rollback()
+            return jsonify({"error": "Database commit failed."}), 500
 
     return running_dictionary
 

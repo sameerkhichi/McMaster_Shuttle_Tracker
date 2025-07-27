@@ -126,7 +126,10 @@ def receive_gpsdata():
         new_location = BusLocation(bus_id=bus_id, nearest_stop=nearest_stop, previous_stop="N/A", next_stop=None, eta=None, time_stamp=timestamp) 
         db.session.add(new_location)
     
-
-    db.session.commit()
-
-    return jsonify({"message": "Location updated"}), 200
+    try:
+        db.session.commit()
+        return jsonify({"message": "Location updated"}), 200
+    except Exception as e:
+        current_app.logger.error(f"Commit failed: {e}")
+        db.session.rollback()
+        return jsonify({"error": "Database commit failed."}), 500

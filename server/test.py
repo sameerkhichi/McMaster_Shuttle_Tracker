@@ -3,7 +3,6 @@ import time
 from datetime import datetime
 
 #Backend endpoint
-BACKEND_URL = "http://localhost:5000/Live_Location"
 
 
 bus_id = "1"
