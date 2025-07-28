@@ -16,9 +16,6 @@ app.config.from_object('server.configuration.config')
 app.register_blueprint(app_routes)
 db.init_app(app)
 
-#Print the active database URI once on startup (helps verify correct DB in prod)
-print(f"Connected to database: {app.config['SQLALCHEMY_DATABASE_URI']}")
-
 #Ensure SQLAlchemy sessions are removed after each request
 @app.teardown_appcontext
 def shutdown_session(exception=None):
