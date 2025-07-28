@@ -30,6 +30,7 @@ def get_bus_locations():
     isRunningDict = helper.getBusRunningDict(locations)
     
     for loc in locations:
+        db.session.refresh(loc) #forcing session expire after queries 
         bus_data.append({
             "bus_id": loc.bus_id,
             "nearest_stop": loc.nearest_stop,
