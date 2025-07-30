@@ -187,6 +187,7 @@ def getBusRunningDict(locations):
 
     for loc in locations:
         originalTimeStamp = loc.time_stamp - timedelta(hours=4) #you need this otherwise loc.timetamp is 4 hours ahead - this ruined me
+        print(now - originalTimeStamp)
         is_running = (now - originalTimeStamp) <= timedelta(minutes=10)
         
         if loc.next_stop is not None:
