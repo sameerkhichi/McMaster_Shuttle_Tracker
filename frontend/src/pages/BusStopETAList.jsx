@@ -58,7 +58,7 @@ function BusStopETAList({ busLocations }) {
 
             {/* Disclaimer Footer */}
             <footer className="text-center text-xs text-gray-500 mt-8 mb-4">
-            Please note that these times are estimated and could vary with peak campus hours
+            Please note that these times are estimated and may vary with peak campus hours
             </footer>
         </main>
     );
