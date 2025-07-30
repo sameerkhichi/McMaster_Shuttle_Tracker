@@ -27,15 +27,15 @@ function App() {
     <div className="min-h-screen bg-white text-gray-900 font-sans pb-16">
       {/* Header */}
       <header className="bg-[#7A003C] text-white py-6 shadow-md px-5">
-        <div className="relative flex items-center justify-center">
+        <div className="flex items-center justify-between gap-10">
           <img 
             src={logo} 
             alt="McMaster Logo" 
-            width="80" 
-            height="80" 
-            className="absolute left-0 top-1/2 transform -translate-y-11"
+            //width="80" 
+            //height="80" 
+            className="w-20 pb-4"
           />
-          <h1 className="text-2xl font-bold text-center">McMaster Parking Shuttle Buses</h1>
+          <h1 className="text-2xl font-bold">McMaster Parking Shuttle Buses</h1>
         </div>
       </header>
 
