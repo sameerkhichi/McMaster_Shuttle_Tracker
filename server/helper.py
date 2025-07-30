@@ -181,12 +181,12 @@ def get_eta(lat, lon, stop, prev_stop): # stop is the current stop - none if not
 #THIS FUNCTION HAS THE ABILITY TO MODIFY THE DATABASE - resets previous stop when bus becomes inactive
 #Function that returns a dictionary of {bus_id: isRunning-true/false}
 def getBusRunningDict(locations):
-    now = datetime.now()  #naive datetime (still universal time)
+    now = datetime.now(timezone.utc)  #naive datetime (still universal time)
     running_dictionary = {}
     reset_needed = False
 
     for loc in locations:
-        originalTimeStamp = loc.time_stamp - timedelta(hours=4) #you need this otherwise loc.timetamp is 4 hours ahead - this ruined me
+        originalTimeStamp = loc.time_stamp.replace(tzinfo=timezone.utc) #avoiding hardcoding a timezone fix - forcing universal time as the database stores UTC as-well
         print(now - originalTimeStamp)
         is_running = (now - originalTimeStamp) <= timedelta(minutes=10)
         
@@ -195,8 +195,6 @@ def getBusRunningDict(locations):
                 is_running = False
         else: 
             is_running = False
-
-        is_running = True #FOR DEBUGGING FORCING TRUE TO IDENTIFY ERROR
 
         # If bus is not running, reset previous stop
         if not is_running and loc.previous_stop != "N/A":
