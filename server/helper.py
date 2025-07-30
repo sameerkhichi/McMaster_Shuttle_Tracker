@@ -195,6 +195,8 @@ def getBusRunningDict(locations):
         else: 
             is_running = False
 
+        is_running = True #FOR DEBUGGING FORCING TRUE TO IDENTIFY ERROR
+
         # If bus is not running, reset previous stop
         if not is_running and loc.previous_stop != "N/A":
             loc.previous_stop = "N/A"
