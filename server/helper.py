@@ -187,7 +187,7 @@ def getBusRunningDict(locations):
 
     for loc in locations:
         originalTimeStamp = loc.time_stamp.replace(tzinfo=timezone.utc) #avoiding hardcoding a timezone fix - forcing universal time as the database stores UTC as-well
-        is_running = (now - originalTimeStamp) <= timedelta(minutes=10)
+        is_running = (now - originalTimeStamp) <= timedelta(minutes=5) #inactive after 5 minutes
         
         if loc.next_stop is not None:
             if loc.eta >= 30: #failsafe incase tracker is on and out of range of campus (reasoning on backend notes)
