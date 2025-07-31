@@ -187,7 +187,6 @@ def getBusRunningDict(locations):
 
     for loc in locations:
         originalTimeStamp = loc.time_stamp.replace(tzinfo=timezone.utc) #avoiding hardcoding a timezone fix - forcing universal time as the database stores UTC as-well
-        print(now - originalTimeStamp)
         is_running = (now - originalTimeStamp) <= timedelta(minutes=10)
         
         if loc.next_stop is not None:
